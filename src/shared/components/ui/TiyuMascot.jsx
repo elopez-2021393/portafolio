@@ -19,21 +19,9 @@ function loadThree() {
     return threeLoadPromise;
 }
 
-/**
- * Mascota 3D de Tiyú (Three.js) lista para usarse dentro de React.
- * Expone sayHello() vía ref para disparar el saludo desde donde lo necesites
- * (ej. justo cuando el usuario inicia sesión).
- *
- * Props:
- *  - size: tamaño en px del canvas (cuadrado)
- *  - greet: si es true, hace la animación de saludo automáticamente al montarse
- */
 export const TiyuMascot = forwardRef(({ size = 110, greet = false, className = '' }, ref) => {
     const containerRef = useRef(null);
     const sayHelloFnRef = useRef(null);
-    // Si alguien llama sayHello() ANTES de que la escena 3D termine de cargar
-    // (typical al iniciar sesión, porque three.js viene de un CDN y tarda unos
-    // cientos de ms), guardamos la intención aquí y la disparamos apenas esté lista.
     const pendingHelloRef = useRef(false);
 
     useImperativeHandle(ref, () => ({
@@ -61,8 +49,6 @@ export const TiyuMascot = forwardRef(({ size = 110, greet = false, className = '
             scene.background = null; // transparente, se integra con el fondo de la app
 
             camera = new THREE.PerspectiveCamera(34, 1, 0.1, 100);
-            // Cámara alejada y centrada más arriba para que entre TODO el cuerpo:
-            // maceta + tierra + planta + brazos, sin recortar nada por arriba ni por abajo.
             camera.position.set(0, 1.25, 5.6);
             camera.lookAt(0, 1.25, 0);
 
