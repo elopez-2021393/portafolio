@@ -1,7 +1,14 @@
-import { useState } from 'react';
-import { User, Mail, Pencil, Send, Copy, MapPin } from 'lucide-react';
+import { useRef, useState } from 'react';
+import emailjs from '@emailjs/browser';
+import { User, Mail, Pencil, Send, Copy, MapPin, CheckCircle2, AlertCircle } from 'lucide-react';
 
 const CONTACT_EMAIL = 'esdras14lopez@gmail.com';
+
+// Credenciales de EmailJS (ver README.md para instrucciones de configuración).
+const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+const EMAILJS_CONFIGURED = Boolean(EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID && EMAILJS_PUBLIC_KEY);
 
 function GitHubIcon({ className }) {
     return (
@@ -47,19 +54,47 @@ const CONTACT_METHODS = [
 ];
 
 function Contact() {
+    const formRef = useRef(null);
     const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
     const [copied, setCopied] = useState(false);
+    // status: 'idle' | 'sending' | 'sent' | 'error'
+    const [status, setStatus] = useState('idle');
 
     const handleChange = (event) => {
         const { name, value } = event.target;
         setForm((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = (event) => {
-        event.preventDefault();
+    const openMailClient = () => {
         const subject = encodeURIComponent(form.subject || `Contacto desde el portafolio — ${form.name}`);
         const body = encodeURIComponent(`${form.message}\n\n— ${form.name} (${form.email})`);
         window.location.href = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
+    };
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+
+        // Si no hay credenciales de EmailJS configuradas, se abre el cliente de correo
+        // del usuario con el mensaje ya redactado, en vez de enviarlo directamente.
+        if (!EMAILJS_CONFIGURED) {
+            openMailClient();
+            return;
+        }
+
+        setStatus('sending');
+        try {
+            await emailjs.sendForm(
+                EMAILJS_SERVICE_ID,
+                EMAILJS_TEMPLATE_ID,
+                formRef.current,
+                { publicKey: EMAILJS_PUBLIC_KEY }
+            );
+            setStatus('sent');
+            setForm({ name: '', email: '', subject: '', message: '' });
+        } catch (error) {
+            console.error('EmailJS error:', error);
+            setStatus('error');
+        }
     };
 
     const handleCopy = async () => {
@@ -86,7 +121,14 @@ function Contact() {
                     Ubicación: <span className="text-ink">Ciudad de Guatemala</span>
                 </p>
 
-                <form onSubmit={handleSubmit} className="mt-10 grid gap-5 md:grid-cols-2">
+                {!EMAILJS_CONFIGURED && (
+                    <p className="mt-4 max-w-xl font-mono text-xs text-muted">
+                        Nota: el envío directo aún no está configurado, así que al enviar
+                        se abrirá tu cliente de correo con el mensaje ya redactado.
+                    </p>
+                )}
+
+                <form ref={formRef} onSubmit={handleSubmit} className="mt-10 grid gap-5 md:grid-cols-2">
                     <div className="flex flex-col gap-5">
                         <label className="flex items-center gap-3 rounded-md border border-border bg-bg px-4 py-3 transition-colors focus-within:border-accent">
                             <User className="h-5 w-5 shrink-0 text-muted" />
@@ -140,11 +182,30 @@ function Contact() {
 
                     <button
                         type="submit"
-                        className="mt-2 inline-flex w-fit items-center gap-2 rounded-full bg-accent px-6 py-3 font-mono text-sm font-medium text-white transition-colors hover:bg-accent-dark md:col-span-2"
+                        disabled={status === 'sending'}
+                        className="mt-2 inline-flex w-fit items-center gap-2 rounded-full bg-accent px-6 py-3 font-mono text-sm font-medium text-white transition-colors hover:bg-accent-dark disabled:cursor-not-allowed disabled:opacity-60 md:col-span-2"
                     >
                         <Send className="h-4 w-4" />
-                        Enviar mensaje
+                        {status === 'sending'
+                            ? 'Enviando...'
+                            : EMAILJS_CONFIGURED
+                                ? 'Enviar mensaje'
+                                : 'Abrir correo con el mensaje'}
                     </button>
+
+                    {status === 'sent' && (
+                        <p className="flex items-center gap-2 font-mono text-sm text-accent md:col-span-2">
+                            <CheckCircle2 className="h-4 w-4" />
+                            ¡Mensaje enviado! Te responderé pronto.
+                        </p>
+                    )}
+
+                    {status === 'error' && (
+                        <p className="flex items-center gap-2 font-mono text-sm text-red-500 md:col-span-2">
+                            <AlertCircle className="h-4 w-4" />
+                            No se pudo enviar. Intenta de nuevo o escribime a {CONTACT_EMAIL}.
+                        </p>
+                    )}
                 </form>
 
                 <div className="mt-16">

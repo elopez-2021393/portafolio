@@ -30,7 +30,7 @@ function About() {
                         mismo tiempo dentro de un mismo proyecto.
                     </p>
                     <p className="mt-4 text-base leading-relaxed text-muted">
-                        Fuera del código, me gusta divertirme jugando videojuegos y futbol,
+                        Fuera del código, me gusta divertirme jugando videojuegos y fútbol,
                         soy una persona sociable y curiosa a la que le gusta hacer nuevos
                         amigos.
                     </p>

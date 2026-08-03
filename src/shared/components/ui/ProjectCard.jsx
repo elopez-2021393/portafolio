@@ -5,7 +5,7 @@ import GalleryThumbs from './GalleryThumbs';
 import ProjectLightbox from './ProjectLightbox';
 
 function ProjectCard({ project }) {
-    const { name, description, tags, status, links, image, mobileImage, gallery } = project;
+    const { name, description, role, tags, status, links, image, mobileImage, gallery } = project;
     const [activeIndex, setActiveIndex] = useState(0);
     const [lightboxOpen, setLightboxOpen] = useState(false);
     const [lightboxView, setLightboxView] = useState('desktop');
@@ -57,6 +57,10 @@ function ProjectCard({ project }) {
                 </div>
 
                 <p className="text-sm leading-relaxed text-muted">{description}</p>
+
+                {role && (
+                    <p className="font-mono text-xs text-accent-dark">{role}</p>
+                )}
 
                 <ul className="flex flex-wrap gap-2">
                     {tags.map((tag) => (
