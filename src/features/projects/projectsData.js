@@ -29,7 +29,7 @@ export const projects = [
                 mobileImage: 'https://res.cloudinary.com/divzjcxko/image/upload/v1785104982/screen_pf237y.png',
             },
         ],
-        links: { repo: 'https://github.com/elopez-2021393/DebuggersEats', demo: 'https://debuggerseats-6d650.web.app/' },
+        links: { demo: 'https://debuggerseats-6d650.web.app/' },
     },
     {
         name: 'ChapinBank',
@@ -56,7 +56,7 @@ export const projects = [
                 mobileImage: 'https://res.cloudinary.com/divzjcxko/image/upload/v1785108392/usercbk_d8dhoc.png',
             },
         ],
-        links: { repo: 'https://github.com/dmarroquin-2024108/ChapinBank.git', demo: 'https://chapin-bank.vercel.app/' },
+        links: { demo: 'https://chapin-bank.vercel.app/' },
     },
     {
         name: 'FeelWeell',
@@ -87,6 +87,6 @@ export const projects = [
                 type: 'tiyu',
             },
         ],
-        links: { repo: 'https://github.com/jzeta-2021001/FeelWeell.git', demo: '' },
+        links: { demo: '' },
     },
 ];
